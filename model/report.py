@@ -10,11 +10,15 @@ log = get_logger(__name__)
 TECH_LIST = [
     "coal_adv",
     "coal_adv_cfNH3",
+    "coal_adv_cfbio",
     "coal_adv_ccs",
+    "coal_adv_rccs",
     "coal_ppl",
     "coal_ppl_cfNH3",
+    "coal_ppl_cfbio",
     "coal_ppl_u",
     "coal_ppl_u_cfNH3",
+    "coal_ppl_u_cfbio",
     "igcc",
     "igcc_ccs",
 ]

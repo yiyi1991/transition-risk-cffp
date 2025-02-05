@@ -18,6 +18,7 @@ TECH_LIST = [
     "coal_adv_cfNH3",
     "coal_adv_cfbio",
     "coal_adv_ccs",
+    "coal_adv_rccs",
     "coal_ppl",
     "coal_ppl_cfNH3",
     "coal_ppl_cfbio",
@@ -39,9 +40,8 @@ SCEN_LIST = [
     "sv_2c",
     "sv_2c_rapid_xcoal",
     "sv_2c_buffer_decoal",
-    # "sv_1p5c",
-    # "sv_cpol",
-    # "sv_2c_cf",
+    "sv_1p5c",
+    "sv_cpol",
 ]
 
 REG_LIST = ["R12_SAS", "R12_CHN", "R12_PAS", "R12_RCPA"]

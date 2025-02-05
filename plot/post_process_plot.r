@@ -8,17 +8,17 @@ print(Sys.time())
 
 # ---- Color code ----
 color_code_scenario <- c(
-  "1p5c" = "#00BFFF",
-  "2c" = "#0000CD",
-  "2c_rapid_phase" = "#aad4d4",
-  # "2c_buffer_phase" = "#aad4d4",
-  "2c_cf" = "#aad4d4",
-  "cpol" = "grey"
+  "sv_1p5c" = "#00BFFF",
+  "sv_2c" = "#0000CD",
+  "sv_2c_rapid_xcoal" = "#aad4d4",
+  "sv_2c_buffer_decoal" = "#aad4d4",
+  "sv_cpol" = "grey"
 )
 
 color_code_coal <- c(
   "igcc_ccs" = "#ffcd5e",
   "coal_adv_ccs" = "#ec8433",
+  "coal_adv_rccs" = "#faf700",
   "igcc" = "#9a6746",
   "coal_adv" = "#ac2000",
   "coal_ppl" = "#6c2c17",
@@ -57,6 +57,7 @@ colnames(df)[colnames(df) == "inv_cost"] <- "inv_cost"
 # Remove additional modes to avoid double-counting parent technologies
 df %>% filter(!((df$Mode == "M2") & (df$Technology %in% tech_parent))) -> df
 df %>% filter(!((df$Mode == "M3") & (df$Technology %in% tech_parent))) -> df
+df %>% filter(!((df$Mode == "M4") & (df$Technology %in% tech_parent))) -> df
 
 # ---- Calculate CAP_ret ----
 df$prox <- df$Year
@@ -103,10 +104,11 @@ d_ret$Year <- d_ret$Year_prox_act
 d_ret$CAP_stranded <- d_ret$CAP_retire
 d_ret -> dp
 
-dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp$CAP_retire <- dp$CAP_retire / 5
 
 plot_name <- "CAP_ret"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -141,10 +143,11 @@ d_idle$CAP_stranded <- d_idle$CAP_idling
 d_idle$type <- "idle"
 d_idle -> dp
 
-dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp$CAP_idling <- dp$CAP_idling / 5
 
 plot_name <- "CAP_idl"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -170,6 +173,7 @@ set <- c(
   "Region",
   "Technology",
   "Mode",
+  "Year_start",
   "Year",
   "ACT",
   "type",
@@ -189,6 +193,8 @@ d_sv -> dp
 dp$CAP_stranded <- dp$CAP_stranded / 5
 
 plot_name <- "CAP_stranded"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -225,6 +231,7 @@ d_sv <- d_sv %>% # adjust investment cost for addon technologies
     Technology == "coal_adv_cfbio" ~ "coal_adv",
     Technology == "coal_ppl_cfbio" ~ "coal_ppl",
     Technology == "coal_ppl_u_cfbio" ~ "coal_ppl_u",
+    Technology == "coal_adv_rccs" ~ "coal_adv",
     TRUE ~ Technology
   ))
 set <- c(
@@ -232,19 +239,31 @@ set <- c(
   "Region",
   "Technology",
   "Mode",
+  "Year_start",
   "Year",
   "Technology_parent",
   "inv_cost"
 )
 d_sv <- d_sv %>%
   left_join(d_sv %>% select(set),
-    by = c("Technology_parent" = "Technology"),
+    by = c(
+      "Technology_parent" = "Technology",
+      "Year_start" = "Year_start",
+      "Year" = "Year",
+      "Scenario" = "Scenario",
+      "Region" = "Region",
+      "Mode" = "Mode"
+    ),
     suffix = c("", "_add")
   ) %>%
   mutate(inv_cost_all = case_when(
     Technology == "coal_ppl_cfNH3" ~ inv_cost + inv_cost_add,
     Technology == "coal_adv_cfNH3" ~ inv_cost + inv_cost_add,
     Technology == "coal_ppl_u_cfNH3" ~ inv_cost + inv_cost_add,
+    Technology == "coal_ppl_cfbio" ~ inv_cost + inv_cost_add,
+    Technology == "coal_adv_cfbio" ~ inv_cost + inv_cost_add,
+    Technology == "coal_ppl_u_cfbio" ~ inv_cost + inv_cost_add,
+    Technology == "coal_adv_rccs" ~ inv_cost + inv_cost_add,
     TRUE ~ inv_cost
   )) %>%
   select(-ends_with("_add"))
@@ -257,6 +276,8 @@ dp$sv <- dp$sv / 5
 dp$sv <- dp$sv / 1000
 
 plot_name <- "SV_tech"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -298,12 +319,14 @@ ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
 # ---- Plot CAP ----
 d -> dp
 
-dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp %>% filter(dp$Year %in% c(
   "2010", "2015", "2020", "2025", "2030", "2035", "2040",
   "2045", "2050", "2055", "2060", "2070", "2080"
 )) -> dp
+
 plot_name <- "CAP"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -326,13 +349,14 @@ ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
 # ---- Plot ACT ----
 d -> dp
 
-dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp %>% filter(dp$Year %in% c(
   "2010", "2015", "2020", "2025", "2030", "2035", "2040",
   "2045", "2050", "2055", "2060", "2070", "2080"
 )) -> dp
 
 plot_name <- "ACT"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
@@ -354,13 +378,14 @@ ggsave(paste0(plot_name, "_gas_coal.png"), width = 9, height = 5, dpi = 330)
 
 d %>% filter(d$Technology %in% names(color_code_coal)) -> dp
 
-dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp %>% filter(dp$Year %in% c(
   "2010", "2015", "2020", "2025", "2030", "2035", "2040",
   "2045", "2050", "2055", "2060", "2070", "2080"
 )) -> dp
 
 plot_name <- "ACT"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
   ggplot() +
   theme_bw() +
