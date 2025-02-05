@@ -166,8 +166,52 @@ def add_cf_biomass(scen):
 
 
 def add_retro_ccs(scen):
-    """Adds settings of xxx."""
-    pass
+    """Adds retrofitted carbon capture technologies to
+    the coal-fired power plants (CFPPs) in Asian regions.
+    """
+    scen.check_out()
+
+    # Create data file list
+    folder_path = Path(get_repo_root()) / INPUT_DIR / "scenario" / "2c_buffer" / "rccs"
+    data_files = [f for f in os.listdir(folder_path) if f.endswith(".csv")]
+    log.info(f"Data files found: {data_files}")
+
+    # Load data files
+    dic_data = {}
+    for file in data_files:
+        file_path = os.path.join(folder_path, file)
+        key_name = file.replace(".csv", "")  # Remove .csv extension
+        df = pd.read_csv(file_path)
+        if "source" in df.columns:
+            df = df.drop(columns=["source"])  # Drop "source" if it exists
+        dic_data[key_name] = df
+
+    # Add set
+    for i in set_list:
+        if i in dic_data:
+            if i in ["technology", "type_addon", "commodity", "relation", "shares"]:
+                i_str = (
+                    dic_data[i]
+                    .apply(lambda row: row.astype(str).str.cat(sep=", "), axis=1)
+                    .tolist()
+                )  # str or list of str only
+                scen.add_set(i, i_str)
+            else:
+                scen.add_set(i, dic_data[i])
+        else:
+            # print(f"Skipping: {i}")
+            pass
+
+    # Add par
+    for i in par_list:
+        if i in dic_data:
+            scen.add_par(i, dic_data[i])
+            print(f"Added: {i}")
+        else:
+            # print(f"Skipping: {i}")
+            pass
+
+    scen.commit("Retro-CCS biomass added.")
 
 
 def add_buffer_decoal(scen):
@@ -183,8 +227,8 @@ def add_buffer_decoal(scen):
     log.info("Scenario settings (cofiring NH3) added.")
     add_cf_biomass(scen)
     log.info("Scenario settings (cofiring biomass) added.")
-    # add_retro_ccs(scen)
-    # log.info("Scenario settings (retrofitting ccs) added.")
+    add_retro_ccs(scen)
+    log.info("Scenario settings (retrofitting ccs) added.")
 
 
 model_ori = "MESSAGEix-GLOBIOM 2.0-M-R12"

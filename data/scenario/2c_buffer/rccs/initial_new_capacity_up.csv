@@ -1,0 +1,13 @@
+node_loc,technology,year_vtg,value,unit
+R12_EEU,coal_adv_rccs,2030,0.00011,GW
+R12_EEU,coal_adv_rccs,2035,0.00011,GW
+R12_NAM,coal_adv_rccs,2030,0.001,GW
+R12_NAM,coal_adv_rccs,2035,0.001,GW
+R12_CHN,coal_adv_rccs,2030,0.05,GW
+R12_CHN,coal_adv_rccs,2035,0.05,GW
+R12_PAS,coal_adv_rccs,2030,0.0001,GW
+R12_PAS,coal_adv_rccs,2035,0.0001,GW
+R12_RCPA,coal_adv_rccs,2030,0.0001,GW
+R12_RCPA,coal_adv_rccs,2035,0.0001,GW
+R12_SAS,coal_adv_rccs,2030,0.0001,GW
+R12_SAS,coal_adv_rccs,2035,0.0001,GW
