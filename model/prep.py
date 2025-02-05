@@ -16,11 +16,14 @@ log = get_logger(__name__)
 TECH_LIST = [
     "coal_adv",
     "coal_adv_cfNH3",
+    "coal_adv_cfbio",
     "coal_adv_ccs",
     "coal_ppl",
     "coal_ppl_cfNH3",
+    "coal_ppl_cfbio",
     "coal_ppl_u",
     "coal_ppl_u_cfNH3",
+    "coal_ppl_u_cfbio",
     "igcc",
     "igcc_ccs",
 ]
@@ -34,11 +37,11 @@ TECH_BF_LIST = [
 
 SCEN_LIST = [
     "sv_2c",
-    # "sv_2c_rapid_phase",
-    # "sv_2c_buffer_phase",
+    "sv_2c_rapid_xcoal",
+    "sv_2c_buffer_decoal",
     # "sv_1p5c",
-    "sv_cpol",
-    "sv_2c_cf",
+    # "sv_cpol",
+    # "sv_2c_cf",
 ]
 
 REG_LIST = ["R12_SAS", "R12_CHN", "R12_PAS", "R12_RCPA"]
@@ -189,4 +192,4 @@ def prep():
     save_prep(d_prep, "d_prep.csv")
 
 
-# prep()
+prep()

@@ -25,7 +25,10 @@ color_code_coal <- c(
   "coal_ppl_u" = "#170605",
   "coal_adv_cfNH3" = "#bcfffe",
   "coal_ppl_cfNH3" = "#89ffcb",
-  "coal_ppl_u_cfNH3" = "#72d4a9"
+  "coal_ppl_u_cfNH3" = "#72d4a9",
+  "coal_adv_cfbio" = "#d4e6a6",
+  "coal_ppl_cfbio" = "#a2bb87",
+  "coal_ppl_u_cfbio" = "#7d9169"
 )
 
 tech_parent <- c(
@@ -51,7 +54,9 @@ colnames(df)[colnames(df) == "ACT"] <- "ACT"
 colnames(df)[colnames(df) == "CAP"] <- "CAP"
 colnames(df)[colnames(df) == "inv_cost"] <- "inv_cost"
 
+# Remove additional modes to avoid double-counting parent technologies
 df %>% filter(!((df$Mode == "M2") & (df$Technology %in% tech_parent))) -> df
+df %>% filter(!((df$Mode == "M3") & (df$Technology %in% tech_parent))) -> df
 
 # ---- Calculate CAP_ret ----
 df$prox <- df$Year
@@ -217,6 +222,9 @@ d_sv <- d_sv %>% # adjust investment cost for addon technologies
     Technology == "coal_adv_cfNH3" ~ "coal_adv",
     Technology == "coal_ppl_cfNH3" ~ "coal_ppl",
     Technology == "coal_ppl_u_cfNH3" ~ "coal_ppl_u",
+    Technology == "coal_adv_cfbio" ~ "coal_adv",
+    Technology == "coal_ppl_cfbio" ~ "coal_ppl",
+    Technology == "coal_ppl_u_cfbio" ~ "coal_ppl_u",
     TRUE ~ Technology
   ))
 set <- c(
@@ -342,4 +350,32 @@ dp %>%
   scale_fill_manual(values = color_code_coal) -> p
 
 print(p)
-ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
+ggsave(paste0(plot_name, "_gas_coal.png"), width = 9, height = 5, dpi = 330)
+
+d %>% filter(d$Technology %in% names(color_code_coal)) -> dp
+
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp %>% filter(dp$Year %in% c(
+  "2010", "2015", "2020", "2025", "2030", "2035", "2040",
+  "2045", "2050", "2055", "2060", "2070", "2080"
+)) -> dp
+
+plot_name <- "ACT"
+dp %>%
+  ggplot() +
+  theme_bw() +
+  labs(
+    title = plot_name,
+    subtitle = "Region: SAS, CHN, RCPA, PAS; Scenario: all",
+    x = "", y = "Unit: GWa"
+  ) +
+  geom_bar(
+    data = dp, aes(y = ACT, x = Year, fill = Technology),
+    stat = "identity", position = "stack", width = 4
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(vars(Region), vars(Scenario), scales = "free_y") +
+  scale_fill_manual(values = color_code_coal) -> p
+
+print(p)
+ggsave(paste0(plot_name, "_coal.png"), width = 9, height = 5, dpi = 330)
