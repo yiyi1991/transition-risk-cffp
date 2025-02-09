@@ -192,7 +192,7 @@ d_sv <- rbind(t1, t2)
 d_sv -> dp
 dp$CAP_stranded <- dp$CAP_stranded / 5
 
-plot_name <- "CAP_stranded"
+plot_name <- "CAP_stranded_bytech"
 dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
@@ -210,6 +210,27 @@ dp %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   facet_grid(vars(Region), vars(Scenario), scales = "free_y") +
   scale_fill_manual(values = color_code_coal) -> p
+
+print(p)
+ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
+
+plot_name <- "CAP_stranded_bytype"
+dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
+dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
+dp %>%
+  ggplot() +
+  theme_bw() +
+  labs(
+    title = plot_name,
+    subtitle = "Region: SAS, CHN, RCPA, PAS; Scenario: all",
+    x = "", y = "Unit: GW/yr"
+  ) +
+  geom_bar(
+    data = dp, aes(y = CAP_stranded, x = Year, fill = type),
+    stat = "identity", position = "stack", width = 4
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_grid(vars(Region), vars(Scenario), scales = "free_y") -> p
 
 print(p)
 ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
@@ -275,7 +296,7 @@ d_sv -> dp
 dp$sv <- dp$sv / 5
 dp$sv <- dp$sv / 1000
 
-plot_name <- "SV_tech"
+plot_name <- "SV_stranded_bytech"
 dp$Technology %>% factor(levels = names(color_code_coal)) -> dp$Technology
 dp$Scenario %>% factor(levels = names(color_code_scenario)) -> dp$Scenario
 dp %>%
@@ -297,7 +318,7 @@ dp %>%
 print(p)
 ggsave(paste0(plot_name, ".png"), width = 9, height = 5, dpi = 330)
 
-plot_name <- "SV_type"
+plot_name <- "SV_stranded_bytype"
 dp %>%
   ggplot() +
   theme_bw() +
@@ -404,3 +425,6 @@ dp %>%
 
 print(p)
 ggsave(paste0(plot_name, "_coal.png"), width = 9, height = 5, dpi = 330)
+
+# ---- Save rdata ----
+save(d_sv, file = "d_plot.RData")
