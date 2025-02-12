@@ -9,14 +9,10 @@ This repository contains the data and code for assessing the transition risks of
 - ✅ Result plotting
 
 ## Installation
-If `message_ix`, `ixmp`, `message_ix_models` are installed in the environment,
+This repository requires `message_ix`, `ixmp`, and `message_ix_models` installed in the environment.
+See the `requirements.txt`.
 
-```bash
-git clone https://github.com/yiyi1991/transition-risk-cffp.git
-cd transition-risk-cffp
-pip install -e .
-```
-If not,
+The following command works as well.
 ```bash
 pip install -r requirements.txt
 ```
@@ -25,11 +21,11 @@ pip install -r requirements.txt
 TODO: adding usage description (basically run->report->prep->plot)
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This work is licensed under the MIT License - see the LICENSE file for details.
 
 ## Release Information
 The release of this repository will be made available once the paper (Ju et al., 2025, under review) is published.
-All generated results should be considered preliminary until the release.
+All generated results should be considered preliminary until the release. Please do not use or cite by then.
 
 ## Contact
 📧 Email: juyiyi@iiasa.ac.at
